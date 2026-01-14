@@ -1,16 +1,37 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+"use client";
 
 import { MadeWithDyad } from "@/components/made-with-dyad";
+import ReservationForm from "@/components/ReservationForm";
+import AdminReservations from "@/components/AdminReservations";
+import Chatbot from "@/components/Chatbot";
+import { useState } from "react";
 
 const Index = () => {
+  const [refreshAdminReservations, setRefreshAdminReservations] = useState(0);
+
+  const handleReservationChange = () => {
+    setRefreshAdminReservations(prev => prev + 1);
+  };
+
+  const handleBotAction = (action: string) => {
+    if (action === 'refreshReservations') {
+      handleReservationChange();
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">
-          Start building your amazing project here!
-        </p>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-50 p-4">
+      <div className="container mx-auto py-8">
+        <h1 className="text-5xl font-extrabold text-center mb-12 text-blue-600 dark:text-blue-400">
+          Bar-Restaurant Reservation System
+        </h1>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+          <ReservationForm onReservationSuccess={handleReservationChange} />
+          <AdminReservations refreshTrigger={refreshAdminReservations} />
+        </div>
       </div>
+      <Chatbot onBotAction={handleBotAction} />
       <MadeWithDyad />
     </div>
   );
