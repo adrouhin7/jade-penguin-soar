@@ -11,6 +11,10 @@
     "preview": "vite preview",
     "server": "nodemon --watch src/server --exec ts-node src/server/server.ts"
   },
+  "engines": {
+    "node": "20.x",
+    "npm": "10.x"
+  },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
     "@radix-ui/react-accordion": "^1.2.0",
