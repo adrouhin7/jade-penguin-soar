@@ -1,5 +1,6 @@
 "use client";
 
+import { Navigation } from "@/components/Navigation";
 import { MadeWithDyad } from "@/components/made-with-dyad";
 import ReservationForm from "@/components/ReservationForm";
 import AdminReservations from "@/components/AdminReservations";
@@ -21,9 +22,10 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-50 p-4">
+      <Navigation />
       <div className="container mx-auto py-8">
         <h1 className="text-5xl font-extrabold text-center mb-12 text-blue-600 dark:text-blue-400">
-          Bar-Restaurant Reservation System
+          Espace Admin - Gestion des Réservations
         </h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">

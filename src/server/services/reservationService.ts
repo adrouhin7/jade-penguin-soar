@@ -4,11 +4,14 @@ import * as path from 'path';
 interface Reservation {
   id: string;
   name: string;
-  contact: string; // Can be phone or email
+  email: string;
+  phone: string;
   date: string; // YYYY-MM-DD
   time: string; // HH:MM
   numberOfPeople: number;
-  notes?: string;
+  message?: string;
+  createdAt?: string;
+  status?: 'confirmed' | 'pending' | 'cancelled';
 }
 
 const RESERVATIONS_FILE = path.join(__dirname, '../data/reservations.json');
@@ -55,7 +58,7 @@ export const checkAvailability = (date: string, time: string, numberOfPeople: nu
   return { available: true, message: `Seats available for ${numberOfPeople} people at ${time} on ${date}.` };
 };
 
-export const addReservation = (newReservation: Omit<Reservation, 'id'>): { success: boolean; reservation?: Reservation; message: string } => {
+export const addReservation = (newReservation: Omit<Reservation, 'id' | 'createdAt' | 'status'>): { success: boolean; reservation?: Reservation; message: string } => {
   const { date, time, numberOfPeople } = newReservation;
 
   const availability = checkAvailability(date, time, numberOfPeople);
@@ -65,10 +68,15 @@ export const addReservation = (newReservation: Omit<Reservation, 'id'>): { succe
 
   const reservations = loadReservations();
   const id = Date.now().toString(); // Simple unique ID
-  const reservation: Reservation = { id, ...newReservation };
+  const reservation: Reservation = { 
+    id, 
+    ...newReservation,
+    createdAt: new Date().toISOString(),
+    status: 'confirmed'
+  };
   reservations.push(reservation);
   saveReservations(reservations);
-  return { success: true, reservation, message: "Reservation successfully added." };
+  return { success: true, reservation, message: "Réservation confirmée avec succès!" };
 };
 
 export const getReservations = (): Reservation[] => {

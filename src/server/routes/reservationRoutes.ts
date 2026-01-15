@@ -3,36 +3,28 @@ import { addReservation, checkAvailability, getReservations, updateReservation, 
 
 const router = Router();
 
-// POST /reserve - Book a table
-router.post('/reserve', (req, res) => {
-  const { name, contact, date, time, numberOfPeople, notes } = req.body;
+// POST /reservations - Book a table
+router.post('/reservations', (req, res) => {
+  const { name, email, phone, date, time, numberOfPeople, message } = req.body;
 
-  if (!name || !contact || !date || !time || !numberOfPeople) {
+  if (!name || !email || !phone || !date || !time || !numberOfPeople) {
     return res.status(400).json({ success: false, message: 'Missing required reservation fields.' });
   }
 
-  const result = addReservation({ name, contact, date, time, numberOfPeople, notes });
+  const result = addReservation({ 
+    name, 
+    email, 
+    phone, 
+    date, 
+    time, 
+    numberOfPeople, 
+    message: message || '' 
+  });
+  
   if (result.success) {
     return res.status(201).json(result);
   }
   return res.status(400).json(result);
-});
-
-// GET /availability - Check availability
-router.get('/availability', (req, res) => {
-  const { date, time, numberOfPeople } = req.query;
-
-  if (!date || !time || !numberOfPeople) {
-    return res.status(400).json({ success: false, message: 'Missing date, time, or numberOfPeople for availability check.' });
-  }
-
-  const numPeople = parseInt(numberOfPeople as string, 10);
-  if (isNaN(numPeople) || numPeople <= 0) {
-    return res.status(400).json({ success: false, message: 'Invalid number of people.' });
-  }
-
-  const result = checkAvailability(date as string, time as string, numPeople);
-  return res.status(200).json(result);
 });
 
 // GET /reservations - Get all reservations (admin view)
@@ -51,8 +43,8 @@ router.get('/reservations/:id', (req, res) => {
   return res.status(404).json({ success: false, message: 'Reservation not found.' });
 });
 
-// PUT /reserve/:id - Modify a reservation
-router.put('/reserve/:id', (req, res) => {
+// PUT /reservations/:id - Modify a reservation
+router.put('/reservations/:id', (req, res) => {
   const { id } = req.params;
   const updates = req.body;
 
@@ -67,15 +59,31 @@ router.put('/reserve/:id', (req, res) => {
   return res.status(404).json(result);
 });
 
-
-// DELETE /cancel/:id - Cancel a reservation
-router.delete('/cancel/:id', (req, res) => {
+// DELETE /reservations/:id - Cancel a reservation
+router.delete('/reservations/:id', (req, res) => {
   const { id } = req.params;
   const result = cancelReservation(id);
   if (result.success) {
     return res.status(200).json(result);
   }
   return res.status(404).json(result);
+});
+
+// GET /availability - Check availability
+router.get('/availability', (req, res) => {
+  const { date, time, numberOfPeople } = req.query;
+
+  if (!date || !time || !numberOfPeople) {
+    return res.status(400).json({ success: false, message: 'Missing date, time, or numberOfPeople for availability check.' });
+  }
+
+  const numPeople = parseInt(numberOfPeople as string, 10);
+  if (isNaN(numPeople) || numPeople <= 0) {
+    return res.status(400).json({ success: false, message: 'Invalid number of people.' });
+  }
+
+  const result = checkAvailability(date as string, time as string, numPeople);
+  return res.status(200).json(result);
 });
 
 // GET /opening-hours - Get opening hours

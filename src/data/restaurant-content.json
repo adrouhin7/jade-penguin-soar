@@ -1,0 +1,158 @@
+{
+  "restaurant": {
+    "name": "O'Rubri",
+    "location": "Rougemont",
+    "description": "Découvrez une expérience culinaire authentique et chaleureuse. O'Rubri est votre destination pour des moments inoubliables en famille ou entre amis.",
+    "tagline": "Saveurs, Ambiance, Convivialité",
+    "image": "/restaurant-hero.jpg"
+  },
+  "hours": {
+    "monday": { "open": "11:30", "close": "22:00" },
+    "tuesday": { "open": "11:30", "close": "22:00" },
+    "wednesday": { "open": "11:30", "close": "22:00" },
+    "thursday": { "open": "11:30", "close": "22:00" },
+    "friday": { "open": "11:30", "close": "23:00" },
+    "saturday": { "open": "11:30", "close": "23:00" },
+    "sunday": { "open": "12:00", "close": "21:00" }
+  },
+  "contact": {
+    "phone": "+33 (0)2 99 73 XX XX",
+    "email": "contact@orubri.fr",
+    "address": "Rougemont, Bretagne"
+  },
+  "ambiance": "Chaleureuse et conviviale avec une décoration rustico-moderne. Venez profiter d'une atmosphère relaxante et accueillante.",
+  "menu": {
+    "entrees": [
+      {
+        "name": "Soupe à l'oignon gratinée",
+        "description": "Soupe traditionnelle avec fromage fondant",
+        "price": 8.50
+      },
+      {
+        "name": "Plateau de charcuteries bretonnes",
+        "description": "Jambon, saucisson et terrines du terroir",
+        "price": 14.00
+      },
+      {
+        "name": "Salade de fruits de mer",
+        "description": "Crevettes, noix de Saint-Jacques et laitue",
+        "price": 16.00
+      },
+      {
+        "name": "Pâté de foie gras maison",
+        "description": "Servi avec pain d'épices grillé",
+        "price": 12.00
+      }
+    ],
+    "plats": [
+      {
+        "name": "Homard thermidor",
+        "description": "Homard entier gratinéau fromage blanc",
+        "price": 28.00
+      },
+      {
+        "name": "Côte de boeuf normandie",
+        "description": "Viande race Charolais avec sauce aux champignons",
+        "price": 26.00
+      },
+      {
+        "name": "Bar rôti aux herbes",
+        "description": "Poisson entier avec légumes de saison",
+        "price": 24.00
+      },
+      {
+        "name": "Canard aux cerises",
+        "description": "Magret tendre avec sauce miel et cerises",
+        "price": 23.00
+      },
+      {
+        "name": "Rissoles bretonnes",
+        "description": "Pâte feuilletée fourrée de fruits de mer",
+        "price": 18.00
+      }
+    ],
+    "desserts": [
+      {
+        "name": "Fondant au chocolat noir",
+        "description": "Coulant au cœur chocolat avec glace vanille",
+        "price": 7.50
+      },
+      {
+        "name": "Tarte Tatin",
+        "description": "Pommes caramélisées et pâte brisée croustillante",
+        "price": 6.50
+      },
+      {
+        "name": "Crème brûlée",
+        "description": "Saveur vanille de Madagascar",
+        "price": 6.00
+      },
+      {
+        "name": "Panna cotta aux fruits rouges",
+        "description": "Crème légère avec coulis de fruits",
+        "price": 7.00
+      }
+    ],
+    "boissons": [
+      {
+        "name": "Vin rouge - Bordeaux",
+        "description": "Saint-Julien, château réputé",
+        "price": "À partir de 25.00"
+      },
+      {
+        "name": "Vin blanc - Bourgogne",
+        "description": "Chardonnay élégant et délicat",
+        "price": "À partir de 22.00"
+      },
+      {
+        "name": "Cidre breton",
+        "description": "Cidre artisanal de Normandie",
+        "price": 5.00
+      },
+      {
+        "name": "Bière locale",
+        "description": "Bière artisanale bretonne",
+        "price": 4.50
+      },
+      {
+        "name": "Jus frais maison",
+        "description": "Orange, pomme ou raisin",
+        "price": 3.50
+      }
+    ]
+  },
+  "events": [
+    {
+      "id": 1,
+      "title": "Soirée Jazz",
+      "date": "2026-02-14",
+      "time": "20:00",
+      "description": "Musique jazz live dans une ambiance intime et relaxante",
+      "image": "/event-jazz.jpg"
+    },
+    {
+      "id": 2,
+      "title": "Concert Acoustique",
+      "date": "2026-02-21",
+      "time": "19:00",
+      "description": "Soirée musique acoustique avec artiste local",
+      "image": "/event-acoustic.jpg"
+    },
+    {
+      "id": 3,
+      "title": "Brunch Dominical",
+      "date": "2026-02-15",
+      "time": "11:00",
+      "description": "Buffet brunch avec champagne et musique d'ambiance",
+      "image": "/event-brunch.jpg"
+    },
+    {
+      "id": 4,
+      "title": "Soirée Dégustation Vins",
+      "date": "2026-03-01",
+      "time": "19:30",
+      "description": "Découvrez nos meilleurs crus avec un menu gourmand",
+      "image": "/event-wine.jpg"
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+#!/bin/bash
+# O'Rubri Restaurant - Quick Start Script
+
+echo "🍷 O'Rubri Restaurant System - Quick Start"
+echo "==========================================="
+echo ""
+
+# Check if node_modules exists
+if [ ! -d "node_modules" ]; then
+    echo "📦 Installation des dépendances..."
+    pnpm install
+else
+    echo "✅ Dépendances déjà installées"
+fi
+
+echo ""
+echo "🚀 Commandes disponibles:"
+echo ""
+echo "   Frontend (Dev):"
+echo "   $ pnpm dev"
+echo "   → Lance le serveur de développement sur http://localhost:5173"
+echo ""
+echo "   Backend (Dev):"
+echo "   $ pnpm run server"
+echo "   → Lance le serveur API sur http://localhost:3001"
+echo ""
+echo "   Build Production:"
+echo "   $ pnpm build"
+echo "   → Compile l'application pour la production"
+echo ""
+echo "   Lint:"
+echo "   $ pnpm lint"
+echo "   → Vérifier le code pour les erreurs"
+echo ""
+echo "📚 Documentation:"
+echo ""
+echo "   - README.md                  → Vue d'ensemble du projet"
+echo "   - GUIDE_UTILISATION.md       → Guide pour clients et admins"
+echo "   - MODIFICATIONS.md           → Historique des changements"
+echo "   - RESERVATIONS_SCHEMA.md     → Structure des données"
+echo ""
+echo "🎨 Customisation:"
+echo ""
+echo "   - src/data/restaurant-content.json  → Infos du restaurant, menu, événements"
+echo "   - src/globals.css                   → Couleurs et thème"
+echo "   - src/components/Navigation.tsx     → Barre de navigation"
+echo ""
+echo "🌐 URLs principales:"
+echo ""
+echo "   Accueil:        http://localhost:5173/"
+echo "   Réservation:    http://localhost:5173/reservation"
+echo "   Menu:           http://localhost:5173/menu"
+echo "   Événements:     http://localhost:5173/events"
+echo "   Admin:          http://localhost:5173/"
+echo ""
+echo "✨ Prêt à commencer!"
+echo ""
