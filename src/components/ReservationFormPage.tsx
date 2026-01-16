@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,6 +28,20 @@ export const ReservationForm: React.FC = () => {
   });
   const [loading, setLoading] = useState(false);
   const [openSelects, setOpenSelects] = useState({ time: false, people: false });
+
+  // Réinitialiser le formulaire de manière sécurisée
+  const resetForm = useCallback(() => {
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      date: undefined,
+      time: '',
+      numberOfPeople: '',
+      message: '',
+    });
+    setOpenSelects({ time: false, people: false });
+  }, []);
 
   const availableTimes = Array.from({ length: 12 }, (_, i) => {
     const hour = 11 + i;
@@ -101,20 +115,10 @@ export const ReservationForm: React.FC = () => {
       
       if (response.status === 201 || response.status === 200) {
         showSuccess(`Réservation confirmée pour ${formData.name}! Un email de confirmation a été envoyé.`);
-        // Fermer les Select et réinitialiser
-        setOpenSelects({ time: false, people: false });
-        // Délai pour s'assurer que les Select sont entièrement fermés et démonté
+        // Réinitialiser le formulaire avec délai pour éviter les erreurs de DOM
         setTimeout(() => {
-          setFormData({
-            name: '',
-            email: '',
-            phone: '',
-            date: undefined,
-            time: '',
-            numberOfPeople: '',
-            message: '',
-          });
-        }, 300);
+          resetForm();
+        }, 500);
       } else {
         showError(responseData.error || responseData.message || 'Erreur serveur');
       }
