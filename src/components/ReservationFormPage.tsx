@@ -85,9 +85,12 @@ export const ReservationForm: React.FC = () => {
       };
 
       console.log('📤 Envoi de la réservation:', reservationData);
-      console.log('📍 URL cible:', 'http://localhost:3001/api/reservations');
+      const apiUrl = process.env.NODE_ENV === 'production'
+        ? 'https://o-rubri-backend.onrender.com/api/reservations'
+        : 'http://localhost:3001/api/reservations';
+      console.log('📍 URL cible:', apiUrl);
 
-      const response = await fetch('http://localhost:3001/api/reservations', {
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(reservationData)

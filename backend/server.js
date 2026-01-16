@@ -12,7 +12,14 @@ const PORT = process.env.PORT || 3001;
 const RESERVATIONS_FILE = path.join(__dirname, 'reservations.json');
 
 // Middleware
-app.use(cors());
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production'
+    ? 'https://o-rubri-frontend.onrender.com'
+    : 'http://localhost:5173',
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Fonction pour lire les réservations
