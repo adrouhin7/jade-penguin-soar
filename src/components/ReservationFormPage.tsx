@@ -92,15 +92,16 @@ export const ReservationForm: React.FC = () => {
         phone: formData.phone,
         date: formattedDate,
         time: formData.time,
-        numberOfPeople: numPeople,
+        guests: numPeople,
         message: formData.message,
       };
 
       console.log('📤 Envoi de la réservation:', reservationData);
       const apiUrl = window.location.hostname.includes('onrender.com')
         ? 'https://o-rubri-backend.onrender.com/api/reservations'
-        : 'http://localhost:3001/api/reservations';
+        : 'http://localhost:3000/api/reservations';
       console.log('📍 URL cible:', apiUrl);
+      console.log('📦 Payload envoyé:', JSON.stringify(reservationData, null, 2));
 
       const response = await fetch(apiUrl, {
         method: 'POST',
@@ -109,7 +110,8 @@ export const ReservationForm: React.FC = () => {
       });
 
       const responseData = await response.json();
-      console.log('✅ Réponse du serveur (Status:', response.status, '):', responseData);
+      console.log('📥 Réponse du serveur - Status:', response.status);
+      console.log('📥 Données reçues:', responseData);
       
       if (response.status === 201 || response.status === 200) {
         showSuccess(`Réservation confirmée pour ${formData.name}! Un email de confirmation a été envoyé.`);

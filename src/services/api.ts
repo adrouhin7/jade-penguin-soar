@@ -7,7 +7,7 @@ const getApiBaseUrl = (): string => {
     return 'https://o-rubri-backend.onrender.com';
   }
   // En développement local
-  return 'http://localhost:3001';
+  return 'http://localhost:3000';
 };
 
 const API_BASE_URL = getApiBaseUrl();
