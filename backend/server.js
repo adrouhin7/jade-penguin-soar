@@ -14,10 +14,12 @@ const RESERVATIONS_FILE = path.join(__dirname, 'reservations.json');
 // Middleware
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production'
-    ? 'https://o-rubri-frontend.onrender.com'
+    ? process.env.FRONTEND_URL || 'https://o-rubri-frontend.onrender.com'
     : 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  allowedHeaders: ['Content-Type', 'Authorization']
 };
 app.use(cors(corsOptions));
 app.use(express.json());
