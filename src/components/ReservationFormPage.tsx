@@ -85,7 +85,7 @@ export const ReservationForm: React.FC = () => {
       };
 
       console.log('📤 Envoi de la réservation:', reservationData);
-      const apiUrl = process.env.NODE_ENV === 'production'
+      const apiUrl = window.location.hostname.includes('onrender.com')
         ? 'https://o-rubri-backend.onrender.com/api/reservations'
         : 'http://localhost:3001/api/reservations';
       console.log('📍 URL cible:', apiUrl);

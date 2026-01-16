@@ -11,16 +11,32 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const RESERVATIONS_FILE = path.join(__dirname, 'reservations.json');
 
-// Middleware
+// Déterminer l'origin CORS basé sur l'environnement
+const getFrontendUrl = () => {
+  // Si FRONTEND_URL est défini, l'utiliser
+  if (process.env.FRONTEND_URL) {
+    return process.env.FRONTEND_URL;
+  }
+  // Sinon, utiliser basé sur le PORT (Render vs localhost)
+  if (PORT !== '3001') {
+    // Si le PORT n'est pas 3001, on est probablement en production
+    return 'https://o-rubri-frontend.onrender.com';
+  }
+  // Par défaut, localhost
+  return 'http://localhost:5173';
+};
+
+const frontendUrl = getFrontendUrl();
+console.log(`🔐 CORS Origin configuré pour: ${frontendUrl}`);
+
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production'
-    ? process.env.FRONTEND_URL || 'https://o-rubri-frontend.onrender.com'
-    : 'http://localhost:5173',
+  origin: [frontendUrl, 'http://localhost:5173', 'https://o-rubri-frontend.onrender.com'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true,
   optionsSuccessStatus: 200,
   allowedHeaders: ['Content-Type', 'Authorization']
 };
+
 app.use(cors(corsOptions));
 app.use(express.json());
 
