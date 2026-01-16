@@ -27,7 +27,6 @@ export const ReservationForm: React.FC = () => {
     message: '',
   });
   const [loading, setLoading] = useState(false);
-  const [openSelects, setOpenSelects] = useState({ time: false, people: false });
 
   // Réinitialiser le formulaire de manière sécurisée
   const resetForm = useCallback(() => {
@@ -40,7 +39,6 @@ export const ReservationForm: React.FC = () => {
       numberOfPeople: '',
       message: '',
     });
-    setOpenSelects({ time: false, people: false });
   }, []);
 
   const availableTimes = Array.from({ length: 12 }, (_, i) => {
@@ -234,13 +232,9 @@ export const ReservationForm: React.FC = () => {
             </span>
           </Label>
           <Select
-  value={formData.time}
-  onValueChange={(value) => handleChange('time', value)}
-  open={openSelects.time}
-  onOpenChange={(open) =>
-    setOpenSelects(prev => ({ ...prev, time: open }))
-  }
->
+            value={formData.time}
+            onValueChange={(value) => handleChange('time', value)}
+          >
             <SelectTrigger className="border-2 border-amber-200 rounded-xl focus:border-orange-500">
               <SelectValue placeholder="Sélectionner une heure" />
             </SelectTrigger>
@@ -262,7 +256,10 @@ export const ReservationForm: React.FC = () => {
               <span className="text-orange-600">*</span> Personnes
             </span>
           </Label>
-          <Select value={formData.numberOfPeople} onValueChange={(value) => handleChange('numberOfPeople', value)} open={openSelects.people} onOpenChange={(open) => setOpenSelects(prev => ({ ...prev, people: open }))}>
+          <Select 
+            value={formData.numberOfPeople} 
+            onValueChange={(value) => handleChange('numberOfPeople', value)}
+          >
             <SelectTrigger className="border-2 border-amber-200 rounded-xl focus:border-orange-500">
               <SelectValue placeholder="Nombre de personnes" />
             </SelectTrigger>
