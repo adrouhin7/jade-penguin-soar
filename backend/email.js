@@ -80,8 +80,7 @@ Message : ${reservation.message || 'Aucun'}`;
             }
           ],
           Subject: `Nouvelle réservation - ${reservation.name}`,
-          TextPart: textContent,
-          TrackOpens: 'true'
+          TextPart: textContent
         }
       ]
     });
