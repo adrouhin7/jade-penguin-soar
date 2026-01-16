@@ -1,7 +1,7 @@
 require('dotenv').config();
 const { sendReservationEmail } = require('./email');
 
-console.log('\n\n🧪 === TEST D\'ENVOI D\'EMAIL ===\n');
+console.log('\n\n🧪 === TEST D\'ENVOI D\'EMAIL VIA API MAILJET ===\n');
 
 const testReservation = {
   name: 'Test Agent',
@@ -19,7 +19,7 @@ console.log('\n⏳ Envoi en cours...\n');
 
 sendReservationEmail(testReservation).then(success => {
   if (success) {
-    console.log('\n✅ TEST RÉUSSI ! L\'email a été envoyé avec succès.\n');
+    console.log('\n✅ TEST RÉUSSI ! L\'email a été envoyé via l\'API Mailjet.\n');
   } else {
     console.log('\n❌ ÉCHEC DU TEST. Vérifiez les logs ci-dessus pour plus de détails.\n');
   }
