@@ -170,66 +170,6 @@ Cet email a été généré automatiquement.
     return false;
   }
 }
-        <head>
-          <meta charset="UTF-8">
-          <style>
-            body { font-family: Arial, sans-serif; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9; }
-            .header { background: #d4652f; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0; }
-            .content { background: white; padding: 20px; }
-            .info-row { margin: 12px 0; padding: 10px; border-left: 3px solid #d4652f; }
-            .label { font-weight: bold; color: #d4652f; }
-            .footer { background: #f0f0f0; padding: 15px; text-align: center; font-size: 12px; color: #666; border-radius: 0 0 5px 5px; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>🍷 Nouvelle Réservation O'Rubri</h1>
-            </div>
-            <div class="content">
-              <h2>Détails de la réservation</h2>
-              
-              <div class="info-row">
-                <span class="label">Nom du client :</span> ${data.name}
-              </div>
-              
-              <div class="info-row">
-                <span class="label">Email :</span> ${data.email}
-              </div>
-      <div class="value" style="margin-top: 5px; padding: 10px; background-color: #f9f9f9; border-left: 3px solid #d97706;">
-        ${reservation.message}
-      </div>
-    </div>
-    ` : ''}
-    
-    <footer>
-      <p>Cet email a été généré automatiquement par le système de réservation O'Rubri.</p>
-    </footer>
-  </div>
-</body>
-</html>
-    `;
-
-    // Options d'envoi
-    const mailOptions = {
-      from: emailFrom,
-      to: emailTo,
-      subject: `🍷 Nouvelle réservation - ${reservation.name} le ${reservation.date}`,
-      text: textContent,
-      html: htmlContent,
-    };
-
-    // Envoyer l'email
-    const info = await transporter.sendMail(mailOptions);
-    console.log('✅ Email envoyé:', info.messageId);
-    return true;
-  } catch (error) {
-    console.error('❌ Erreur lors de l\'envoi d\'email:', error.message);
-    // Ne pas lancer l'erreur pour ne pas bloquer la réservation
-    return false;
-  }
-}
 
 module.exports = {
   sendReservationEmail,
