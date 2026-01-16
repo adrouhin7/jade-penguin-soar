@@ -1,6 +1,8 @@
 require('dotenv').config();
 const { sendReservationEmail } = require('./email');
 
+console.log('\n\n🧪 === TEST D\'ENVOI D\'EMAIL ===\n');
+
 const testReservation = {
   name: 'Test Agent',
   email: 'test@example.com',
@@ -11,25 +13,18 @@ const testReservation = {
   message: 'Test automatique'
 };
 
-console.log('🔍 Démarrage du test d\'envoi d\'email...\n');
-console.log('📋 Configuration détectée :');
-console.log(`   MJ_APIKEY_PUBLIC: ${process.env.MJ_APIKEY_PUBLIC ? '✅ Configuré' : '❌ Manquant'}`);
-console.log(`   MJ_APIKEY_PRIVATE: ${process.env.MJ_APIKEY_PRIVATE ? '✅ Configuré' : '❌ Manquant'}`);
-console.log(`   EMAIL_FROM: ${process.env.EMAIL_FROM ? '✅ Configuré' : '❌ Manquant'}`);
-console.log(`   EMAIL_TO: ${process.env.EMAIL_TO ? '✅ Configuré' : '❌ Manquant'}\n`);
-
-console.log('📧 Objet de test :');
+console.log('📧 Objet de réservation de test :');
 console.log(JSON.stringify(testReservation, null, 2));
 console.log('\n⏳ Envoi en cours...\n');
 
 sendReservationEmail(testReservation).then(success => {
   if (success) {
-    console.log('\n✅ Test réussi ! L\'email a été envoyé avec succès.');
+    console.log('\n✅ TEST RÉUSSI ! L\'email a été envoyé avec succès.\n');
   } else {
-    console.log('\n❌ Échec du test. Vérifiez les logs ci-dessus pour plus de détails.');
+    console.log('\n❌ ÉCHEC DU TEST. Vérifiez les logs ci-dessus pour plus de détails.\n');
   }
-  process.exit(0);
+  process.exit(success ? 0 : 1);
 }).catch(error => {
-  console.error('\n❌ Erreur non gérée :', error);
+  console.error('\n❌ ERREUR NON GÉRÉE :', error);
   process.exit(1);
 });

@@ -1,17 +1,28 @@
 require('dotenv').config();
 const nodemailer = require('nodemailer');
 
-// Vérifier les variables d'environnement requises
+// ✅ Vérifier les variables d'environnement requises au démarrage
+console.log('\n📋 === VÉRIFICATION DE LA CONFIGURATION EMAIL ===');
 const requiredEnvVars = ['MJ_APIKEY_PUBLIC', 'MJ_APIKEY_PRIVATE', 'EMAIL_FROM', 'EMAIL_TO'];
+let allVarsPresent = true;
+
 requiredEnvVars.forEach(envVar => {
-  if (!process.env[envVar]) {
-    console.warn(`⚠️ Variable manquante : ${envVar}`);
-  }
+  const isPresent = !!process.env[envVar];
+  const status = isPresent ? '✅' : '❌';
+  console.log(`${status} ${envVar}: ${isPresent ? 'Configuré' : 'MANQUANT'}`);
+  if (!isPresent) allVarsPresent = false;
 });
 
+if (!allVarsPresent) {
+  console.warn('\n⚠️  ATTENTION : Une ou plusieurs variables d\'environnement manquent !');
+  console.warn('   L\'envoi d\'email sera désactivé jusqu\'à leur configuration.\n');
+} else {
+  console.log('\n✅ Toutes les variables requises sont configurées.\n');
+}
+
 function createTransporter() {
+  // Vérifier les clés API Mailjet
   if (!process.env.MJ_APIKEY_PUBLIC || !process.env.MJ_APIKEY_PRIVATE) {
-    console.warn('⚠️ Aucune configuration email trouvée. Email non envoyé.');
     return null;
   }
 
@@ -30,10 +41,13 @@ async function sendReservationEmail(reservation) {
   try {
     const transporter = createTransporter();
 
-    if (!transporter) {
-      console.warn('⚠️ Aucune configuration email trouvée. Email non envoyé.');
+    // Vérifier que toutes les variables sont présentes
+    if (!transporter || !process.env.EMAIL_FROM || !process.env.EMAIL_TO) {
+      console.warn('⚠️  Aucune configuration email trouvée. Email non envoyé.');
       return false;
     }
+
+    console.log('📨 Tentative d\'envoi d\'email…');
 
     const reservationDate = new Date(reservation.date).toLocaleDateString(
       'fr-FR',
@@ -62,8 +76,8 @@ Message : ${reservation.message || 'Aucun'}`;
       text: textContent,
     };
 
-    await transporter.sendMail(mailOptions);
-    console.log('✅ Email envoyé');
+    const info = await transporter.sendMail(mailOptions);
+    console.log('✅ Email envoyé avec succès. ID:', info.messageId);
     return true;
   } catch (error) {
     console.error('❌ Échec de l\'envoi :', error.message);
