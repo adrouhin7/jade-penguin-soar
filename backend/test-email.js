@@ -1,39 +1,35 @@
-/**
- * Exemple de test pour sendReservationEmail
- * 
- * À exécuter avec : node test-email.js
- * 
- * Assurez-vous que votre .env est configuré :
- * SMTP_USER=votre_clé_api_mailjet
- * SMTP_PASS=votre_clé_secrète_mailjet
- * EMAIL_FROM=adresse@domaine.com
- * EMAIL_TO=adresse@domaine.com
- */
-
 require('dotenv').config();
 const { sendReservationEmail } = require('./email');
 
-// Données de test
 const testReservation = {
-  name: 'Jean Dupont',
-  email: 'jean.dupont@example.com',
-  phone: '+33 2 99 73 12 34',
-  date: '2026-01-20',
-  time: '19:30',
-  numberOfPeople: 4,
-  message: 'Allergies aux fruits de mer - Table près de la fenêtre si possible'
+  name: 'Test Agent',
+  email: 'test@example.com',
+  phone: '0600000000',
+  date: '2025-01-01',
+  time: '20:00',
+  guests: 2,
+  message: 'Test automatique'
 };
 
-console.log('🚀 Envoi d\'un email de test...\n');
-console.log('📊 Données de réservation :', testReservation);
-console.log('\n---\n');
+console.log('🔍 Démarrage du test d\'envoi d\'email...\n');
+console.log('📋 Configuration détectée :');
+console.log(`   MJ_APIKEY_PUBLIC: ${process.env.MJ_APIKEY_PUBLIC ? '✅ Configuré' : '❌ Manquant'}`);
+console.log(`   MJ_APIKEY_PRIVATE: ${process.env.MJ_APIKEY_PRIVATE ? '✅ Configuré' : '❌ Manquant'}`);
+console.log(`   EMAIL_FROM: ${process.env.EMAIL_FROM ? '✅ Configuré' : '❌ Manquant'}`);
+console.log(`   EMAIL_TO: ${process.env.EMAIL_TO ? '✅ Configuré' : '❌ Manquant'}\n`);
 
-sendReservationEmail(testReservation).then((success) => {
+console.log('📧 Objet de test :');
+console.log(JSON.stringify(testReservation, null, 2));
+console.log('\n⏳ Envoi en cours...\n');
+
+sendReservationEmail(testReservation).then(success => {
   if (success) {
-    console.log('\n✅ Email envoyé avec succès !');
-    console.log('Vérifiez votre boîte mail à :', process.env.EMAIL_TO);
+    console.log('\n✅ Test réussi ! L\'email a été envoyé avec succès.');
   } else {
-    console.log('\n❌ Erreur lors de l\'envoi de l\'email');
+    console.log('\n❌ Échec du test. Vérifiez les logs ci-dessus pour plus de détails.');
   }
   process.exit(0);
+}).catch(error => {
+  console.error('\n❌ Erreur non gérée :', error);
+  process.exit(1);
 });
