@@ -1,53 +1,175 @@
 const nodemailer = require('nodemailer');
 
-// Configuration du transporteur Mailjet SMTP
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'in-v3.mailjet.com',
-  port: parseInt(process.env.SMTP_PORT) || 587,
-  secure: false, // TLS
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
+/**
+ * Crée un transporteur Nodemailer
+ * Supporte Gmail ou SMTP personnalisé selon la configuration
+ */
+function createTransporter() {
+  // Si des identifiants Gmail sont fournis
+  if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+    return nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    });
   }
-});
+
+  // Sinon, essayer SMTP personnalisé (Mailjet, SendGrid, etc.)
+  if (process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS) {
+    return nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT || '587'),
+      secure: process.env.SMTP_SECURE === 'true',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+  }
+
+  return null;
+}
 
 /**
  * Envoie un email de réservation
- * @param {Object} data - Données de la réservation
- * @param {string} data.name - Nom du client
- * @param {string} data.email - Email du client
- * @param {string} data.phone - Téléphone du client
- * @param {string} data.date - Date de la réservation
- * @param {string} data.time - Heure de la réservation
- * @param {number} data.numberOfPeople - Nombre de personnes
- * @param {string} data.message - Message optionnel
- * @returns {Promise<boolean>} true si succès, false sinon
+ * @param {Object} reservation - Données de la réservation
+ * @returns {Promise<boolean>}
  */
-async function sendReservationEmail(data) {
+async function sendReservationEmail(reservation) {
   try {
-    // Validation des variables d'environnement
-    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-      console.error('❌ Erreur : identifiants SMTP non configurés');
+    const transporter = createTransporter();
+
+    if (!transporter) {
+      console.warn('⚠️ Aucune configuration email trouvée. Email non envoyé.');
       return false;
     }
 
-    if (!process.env.EMAIL_FROM || !process.env.EMAIL_TO) {
-      console.error('❌ Erreur : EMAIL_FROM ou EMAIL_TO non configurés');
+    // Déterminer les adresses email
+    const emailFrom = process.env.EMAIL_USER || process.env.SMTP_USER;
+    const emailTo = process.env.EMAIL_TO || emailFrom;
+
+    if (!emailFrom) {
+      console.warn('⚠️ Adresse email source non configurée.');
       return false;
     }
 
-    // Formatage de la date
-    const reservationDate = new Date(data.date).toLocaleDateString('fr-FR', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+    // Formater la date
+    const reservationDate = new Date(reservation.date).toLocaleDateString(
+      'fr-FR',
+      {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      }
+    );
 
-    // Contenu HTML de l'email
+    // Contenu texte simple
+    const textContent = `
+Nouvelle réservation sur O'Rubri
+
+Nom : ${reservation.name}
+Email : ${reservation.email}
+Téléphone : ${reservation.phone}
+Date : ${reservationDate}
+Heure : ${reservation.time}
+Nombre de personnes : ${reservation.numberOfPeople}
+Message : ${reservation.message || 'Aucun'}
+
+---
+Cet email a été généré automatiquement.
+    `;
+
+    // Contenu HTML
     const htmlContent = `
-      <!DOCTYPE html>
-      <html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nouvelle réservation O'Rubri</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f5f5f5; }
+    .container { max-width: 600px; margin: 0 auto; background-color: white; padding: 20px; border-radius: 8px; }
+    h1 { color: #d97706; border-bottom: 2px solid #d97706; padding-bottom: 10px; }
+    .info-block { margin: 15px 0; }
+    .label { font-weight: bold; color: #333; }
+    .value { color: #666; }
+    footer { margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #999; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🍷 Nouvelle réservation O'Rubri</h1>
+    
+    <div class="info-block">
+      <span class="label">Nom :</span>
+      <span class="value">${reservation.name}</span>
+    </div>
+    
+    <div class="info-block">
+      <span class="label">Email :</span>
+      <span class="value">${reservation.email}</span>
+    </div>
+    
+    <div class="info-block">
+      <span class="label">Téléphone :</span>
+      <span class="value">${reservation.phone}</span>
+    </div>
+    
+    <div class="info-block">
+      <span class="label">Date :</span>
+      <span class="value">${reservationDate}</span>
+    </div>
+    
+    <div class="info-block">
+      <span class="label">Heure :</span>
+      <span class="value">${reservation.time}</span>
+    </div>
+    
+    <div class="info-block">
+      <span class="label">Nombre de personnes :</span>
+      <span class="value">${reservation.numberOfPeople}</span>
+    </div>
+    
+    ${reservation.message ? `
+    <div class="info-block">
+      <span class="label">Message :</span>
+      <div class="value" style="margin-top: 5px; padding: 10px; background-color: #f9f9f9; border-left: 3px solid #d97706;">
+        ${reservation.message}
+      </div>
+    </div>
+    ` : ''}
+    
+    <footer>
+      <p>Cet email a été généré automatiquement par le système de réservation O'Rubri.</p>
+    </footer>
+  </div>
+</body>
+</html>
+    `;
+
+    // Options d'envoi
+    const mailOptions = {
+      from: emailFrom,
+      to: emailTo,
+      subject: `🍷 Nouvelle réservation - ${reservation.name} le ${reservation.date}`,
+      text: textContent,
+      html: htmlContent,
+    };
+
+    // Envoyer l'email
+    const info = await transporter.sendMail(mailOptions);
+    console.log('✅ Email envoyé:', info.messageId);
+    return true;
+  } catch (error) {
+    console.error('❌ Erreur lors de l\'envoi d\'email:', error.message);
+    // Ne pas lancer l'erreur pour ne pas bloquer la réservation
+    return false;
+  }
+}
         <head>
           <meta charset="UTF-8">
           <style>
@@ -75,72 +197,40 @@ async function sendReservationEmail(data) {
               <div class="info-row">
                 <span class="label">Email :</span> ${data.email}
               </div>
-              
-              <div class="info-row">
-                <span class="label">Téléphone :</span> ${data.phone}
-              </div>
-              
-              <div class="info-row">
-                <span class="label">Date :</span> ${reservationDate}
-              </div>
-              
-              <div class="info-row">
-                <span class="label">Heure :</span> ${data.time}
-              </div>
-              
-              <div class="info-row">
-                <span class="label">Nombre de personnes :</span> ${data.numberOfPeople} ${data.numberOfPeople === 1 ? 'personne' : 'personnes'}
-              </div>
-              
-              ${data.message ? `
-              <div class="info-row">
-                <span class="label">Message :</span> ${data.message}
-              </div>
-              ` : ''}
-              
-              <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;">
-              <p><small><strong>Heure de réception :</strong> ${new Date().toLocaleString('fr-FR')}</small></p>
-            </div>
-            <div class="footer">
-              <p>Réservation système O'Rubri | À traiter rapidement</p>
-            </div>
-          </div>
-        </body>
-      </html>
+      <div class="value" style="margin-top: 5px; padding: 10px; background-color: #f9f9f9; border-left: 3px solid #d97706;">
+        ${reservation.message}
+      </div>
+    </div>
+    ` : ''}
+    
+    <footer>
+      <p>Cet email a été généré automatiquement par le système de réservation O'Rubri.</p>
+    </footer>
+  </div>
+</body>
+</html>
     `;
 
-    // Configuration de l'email
+    // Options d'envoi
     const mailOptions = {
-      from: process.env.EMAIL_FROM,
-      to: process.env.EMAIL_TO,
-      subject: `[O'Rubri] Nouvelle réservation - ${data.name}`,
+      from: emailFrom,
+      to: emailTo,
+      subject: `🍷 Nouvelle réservation - ${reservation.name} le ${reservation.date}`,
+      text: textContent,
       html: htmlContent,
-      text: `
-Nouvelle réservation O'Rubri
-
-Nom : ${data.name}
-Email : ${data.email}
-Téléphone : ${data.phone}
-Date : ${reservationDate}
-Heure : ${data.time}
-Nombre de personnes : ${data.numberOfPeople}
-${data.message ? `Message : ${data.message}` : ''}
-
-Heure de réception : ${new Date().toLocaleString('fr-FR')}
-      `
     };
 
-    // Envoi de l'email
+    // Envoyer l'email
     const info = await transporter.sendMail(mailOptions);
-    console.log('📧 Email envoyé avec succès via Mailjet:', info.messageId);
+    console.log('✅ Email envoyé:', info.messageId);
     return true;
   } catch (error) {
-    console.error('❌ Erreur lors de l\'envoi de l\'email :', error.message);
+    console.error('❌ Erreur lors de l\'envoi d\'email:', error.message);
+    // Ne pas lancer l'erreur pour ne pas bloquer la réservation
     return false;
   }
 }
 
 module.exports = {
   sendReservationEmail,
-  transporter
 };

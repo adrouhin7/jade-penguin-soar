@@ -4,8 +4,11 @@ const fs = require('fs');
 const path = require('path');
 require('dotenv').config();
 
-// Importer la fonction d'email
+// Importer les modules
 const { sendReservationEmail } = require('./email');
+const { connectDB } = require('./db');
+let Reservation;
+let mongoEnabled = false;
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -40,6 +43,20 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
+// Initialisation de MongoDB (optionnel)
+async function initDB() {
+  const mongoConnected = await connectDB();
+  if (mongoConnected) {
+    Reservation = require('./models/Reservation');
+    mongoEnabled = true;
+    console.log('✅ Utilisation de MongoDB pour les réservations');
+  } else {
+    console.log('📁 Utilisation du fichier JSON pour les réservations');
+  }
+}
+
+initDB();
+
 // Fonction pour lire les réservations
 function readReservations() {
   try {
@@ -72,40 +89,57 @@ app.post('/api/reservations', async (req, res) => {
     });
   }
 
-  // Créer la réservation
-  const reservation = {
-    id: Date.now(),
-    name,
-    email,
-    phone,
-    date,
-    time,
-    numberOfPeople: parseInt(numberOfPeople),
-    message: message || '',
-    createdAt: new Date().toISOString()
-  };
-
   try {
-    // Lire les réservations existantes
-    const reservations = readReservations();
+    let reservation;
 
-    // Ajouter la nouvelle réservation
-    reservations.push(reservation);
+    if (mongoEnabled && Reservation) {
+      // Utiliser MongoDB
+      reservation = new Reservation({
+        name,
+        email,
+        phone,
+        date,
+        time,
+        numberOfPeople: parseInt(numberOfPeople),
+        message: message || '',
+        status: 'pending'
+      });
+      await reservation.save();
+      console.log('✅ Réservation MongoDB créée:', reservation._id);
+    } else {
+      // Fallback: utiliser le fichier JSON
+      reservation = {
+        id: Date.now(),
+        name,
+        email,
+        phone,
+        date,
+        time,
+        numberOfPeople: parseInt(numberOfPeople),
+        message: message || '',
+        createdAt: new Date().toISOString()
+      };
 
-    // Écrire dans le fichier
-    writeReservations(reservations);
+      const reservations = readReservations();
+      reservations.push(reservation);
+      writeReservations(reservations);
+      console.log('✅ Réservation JSON créée:', reservation.id);
+    }
 
-    // Afficher en console
-    console.log('✅ Nouvelle réservation enregistrée:', reservation);
-
-    // Envoyer l'email
-    await sendReservationEmail(reservation);
+    // Envoyer l'email (optionnel, ne bloque pas si erreur)
+    try {
+      await sendReservationEmail(reservation);
+      console.log('✅ Email envoyé');
+    } catch (emailError) {
+      console.warn('⚠️ Email non envoyé:', emailError.message);
+    }
 
     // Renvoyer la réponse
     return res.status(201).json({
       success: true,
       message: 'Réservation enregistrée avec succès',
-      reservationId: reservation.id
+      reservationId: mongoEnabled ? reservation._id : reservation.id,
+      data: reservation
     });
   } catch (error) {
     console.error('❌ Erreur lors de la création de la réservation:', error);
@@ -117,9 +151,112 @@ app.post('/api/reservations', async (req, res) => {
 });
 
 // Route GET /api/reservations - Lister toutes les réservations
-app.get('/api/reservations', (req, res) => {
-  const reservations = readReservations();
-  res.json(reservations);
+app.get('/api/reservations', async (req, res) => {
+  try {
+    if (mongoEnabled && Reservation) {
+      // Utiliser MongoDB
+      const reservations = await Reservation.find().sort({ createdAt: -1 });
+      res.json({
+        success: true,
+        source: 'MongoDB',
+        count: reservations.length,
+        data: reservations
+      });
+    } else {
+      // Fallback: utiliser le fichier JSON
+      const reservations = readReservations();
+      res.json({
+        success: true,
+        source: 'JSON',
+        count: reservations.length,
+        data: reservations
+      });
+    }
+  } catch (error) {
+    console.error('❌ Erreur GET /api/reservations:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Erreur serveur'
+    });
+  }
+});
+
+// Route GET /api/reservations/:id - Récupérer une réservation
+app.get('/api/reservations/:id', async (req, res) => {
+  try {
+    if (mongoEnabled && Reservation) {
+      const reservation = await Reservation.findById(req.params.id);
+      if (!reservation) {
+        return res.status(404).json({
+          success: false,
+          error: 'Réservation non trouvée'
+        });
+      }
+      res.json({
+        success: true,
+        data: reservation
+      });
+    } else {
+      const reservations = readReservations();
+      const reservation = reservations.find(r => r.id == req.params.id);
+      if (!reservation) {
+        return res.status(404).json({
+          success: false,
+          error: 'Réservation non trouvée'
+        });
+      }
+      res.json({
+        success: true,
+        data: reservation
+      });
+    }
+  } catch (error) {
+    console.error('❌ Erreur GET /api/reservations/:id:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Erreur serveur'
+    });
+  }
+});
+
+// Route DELETE /api/reservations/:id - Supprimer une réservation
+app.delete('/api/reservations/:id', async (req, res) => {
+  try {
+    if (mongoEnabled && Reservation) {
+      const reservation = await Reservation.findByIdAndDelete(req.params.id);
+      if (!reservation) {
+        return res.status(404).json({
+          success: false,
+          error: 'Réservation non trouvée'
+        });
+      }
+      res.json({
+        success: true,
+        message: 'Réservation supprimée'
+      });
+    } else {
+      const reservations = readReservations();
+      const index = reservations.findIndex(r => r.id == req.params.id);
+      if (index === -1) {
+        return res.status(404).json({
+          success: false,
+          error: 'Réservation non trouvée'
+        });
+      }
+      reservations.splice(index, 1);
+      writeReservations(reservations);
+      res.json({
+        success: true,
+        message: 'Réservation supprimée'
+      });
+    }
+  } catch (error) {
+    console.error('❌ Erreur DELETE /api/reservations/:id:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Erreur serveur'
+    });
+  }
 });
 
 // Route 404
